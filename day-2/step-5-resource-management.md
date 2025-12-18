@@ -90,7 +90,7 @@ You cannot "slow down" memory usage. If a process needs RAM and hits its limit, 
 
 We have a service `memory-grabber` that allocates RAM in a loop.
 
-Deploy it with a small limit (100Mi):
+Deploy it with a small limit (50Mi):
 
 ```bash
 kubectl apply -f k8s/day-2/memory-grabber.yaml
@@ -107,7 +107,7 @@ You will see the Pod status change from `Running` to `OOMKilled`, then `CrashLoo
 
 ### Why?
 
-The container tried to allocate more than `100Mi`. Kubernetes (via cgroups) said "NO", and the kernel terminated the process.
+The container tried to allocate more than `50Mi`. Kubernetes (via cgroups) said "NO", and the kernel terminated the process.
 
 This is a **good thing**: it protects the *Node* and other *Pods* from a memory leak taking down the whole server.
 
