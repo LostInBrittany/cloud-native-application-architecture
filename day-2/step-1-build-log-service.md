@@ -43,7 +43,17 @@ Review the code:
 * **[server.js](../../services/day-2/log-service-step-1/server.js)**: Note the request logging middleware.
 * **[Dockerfile](../../services/day-2/log-service-step-1/Dockerfile)**: Standard Node.js Alpine build.
 
-### Option B: Bring Your Own Code (BYOC)
+### Option B: Use the PHP Implementation (Alternative)
+
+If you prefer PHP, we also provided a simplified PHP version in `services/day-2/log-service-php`.
+
+* **[index.php](../../services/day-2/log-service-php/index.php)**: A simple script using PHP's built-in server.
+* **[Dockerfile](../../services/day-2/log-service-php/Dockerfile)**: Based on `php:alpine`.
+* **[log-service-php.yaml](../../k8s/day-2/log-service-php.yaml)**: Ready-to-use Kubernetes manifest.
+
+To use this, build the image as `log-service-php:dev` and use the provided manifest.
+
+### Option C: Bring Your Own Code (BYOC)
 
 Feel free to write this in Python (Flask/FastAPI), Go, or Java.
 Just ensure it meets the **spec** above.
