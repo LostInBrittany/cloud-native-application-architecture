@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: log-service-php
-          image: log-service-php:dev
+          image: log-service-php:v1
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
