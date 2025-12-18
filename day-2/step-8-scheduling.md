@@ -1,5 +1,18 @@
 # Step 8 – Scheduling: Where does my Pod go?
 
+![Scheduling](/img/day-2/08-scheduling-01.jpg)
+---
+![Taints & Tolerations](/img/day-2/08-scheduling-02.jpg)
+---
+![Using Taints & Tolerations](/img/day-2/08-scheduling-03.jpg)
+---
+![Example use cases for Taints](/img/day-2/08-scheduling-04.jpg)
+---
+![Example use cases for Taints](/img/day-2/08-scheduling-05.jpg)
+---
+![Affinity & Anti-affinity](/img/day-2/08-scheduling-06.jpg)
+---
+
 ## Concept
 
 By default, the Kubernetes Scheduler places Pods on any available node that has enough resources.

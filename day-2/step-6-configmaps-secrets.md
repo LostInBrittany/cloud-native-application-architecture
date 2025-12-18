@@ -1,36 +1,37 @@
 # Step 6 – ConfigMaps & Secrets: Decoupling Config from Code
 
 ![ConfigMaps & Secrets](/img/day-2/06-configmaps-and-secrets-01.jpg)
-
+---
 ![Config files are a bad practice](/img/day-2/06-configmaps-and-secrets-02.jpg)
-
+---
 ![Config maps](/img/day-2/06-configmaps-and-secrets-03.jpg)
-
+---
 ![Creating a Config Map](/img/day-2/06-configmaps-and-secrets-04.jpg)
-
+---
 ![Describing a Config Map](/img/day-2/06-configmaps-and-secrets-05.jpg)
-
+---
 ![Using a Config Map in a Pod](/img/day-2/06-configmaps-and-secrets-06.jpg)
-
+---
 ![Using a Config Map in a Pod](/img/day-2/06-configmaps-and-secrets-07.jpg)
-
+---
 ![Using a Config Map in a Pod](/img/day-2/06-configmaps-and-secrets-08.jpg)
-
+---
 ![Kubernetes secrets](/img/day-2/06-configmaps-and-secrets-09.jpg)
-
+---
 ![A warning on Kubernetes Secrets](/img/day-2/06-configmaps-and-secrets-10.jpg)
-
+---
 ![Creating a Secret](/img/day-2/06-configmaps-and-secrets-11.jpg)
-
+---
 ![Verifying a Secret](/img/day-2/06-configmaps-and-secrets-12.jpg)
-
+---
 ![Decoding a Secret](/img/day-2/06-configmaps-and-secrets-13.jpg)
-
+---
 ![Using a Secret in a Pod](/img/day-2/06-configmaps-and-secrets-14.jpg)
-
+---
 ![Using a Secret in a Pod](/img/day-2/06-configmaps-and-secrets-15.jpg)
-
+---
 ![Using a Secret in a Pod](/img/day-2/06-configmaps-and-secrets-16.jpg)
+---
 
 ## Concept
 

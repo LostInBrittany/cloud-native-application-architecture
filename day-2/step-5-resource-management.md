@@ -1,16 +1,17 @@
 # Step 5 – Resource Management: Requests and Limits
 
 ![Resource Management](/img/day-2/05-resource-management-01.jpg)
-
+--- 
 ![Requests & Limits](/img/day-2/05-resource-management-02.jpg)
-
+---
 ![What if a pod uses too many resources?](/img/day-2/05-resource-management-03.jpg)
-
+---
 ![Resource quota](/img/day-2/05-resource-management-04.jpg)
-
+---
 ![Limit range](/img/day-2/05-resource-management-05.jpg)
-
+---
 ![Verifying resource usage](/img/day-2/05-resource-management-06.jpg)
+---
 
 ## Concept
 
