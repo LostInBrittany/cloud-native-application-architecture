@@ -175,11 +175,11 @@ Let's use our **echo-service** from Day 1 to prove it.
 
     Because we mapped port 8080 when creating the cluster, you can access the service directly!
 
-    **Open in Browser:** [http://localhost:8080](http://localhost:8080)
+    **Open in Browser:** [http://localhost:8080/info](http://localhost:8080/info)
 
     **Or via curl:**
     ```bash
-    curl localhost:8080
+    curl localhost:8080/info
     ```
 
     You should see the JSON log response from your service.
