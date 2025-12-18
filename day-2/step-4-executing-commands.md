@@ -1,5 +1,12 @@
 # Step 4 – Executing Commands in Running Containers
 
+![Executing commands](/img/day-2/04-executing-commands-01.jpg)
+---
+![Executing commands](/img/day-2/04-executing-commands-02.jpg)
+---
+![Executing commands](/img/day-2/04-executing-commands-03.jpg)
+---
+
 ## Concept
 
 Sometimes you need to:
