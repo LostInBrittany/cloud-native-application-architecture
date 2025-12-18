@@ -130,7 +130,7 @@ You are expected to:
 
 ---
 
-### Day 2 – Kubernetes as a Platform
+### [Day 2 – Kubernetes as a Platform](./day-2/README.md)
 
 * Kubernetes core concepts (developer perspective)
 * Deploying and exposing services

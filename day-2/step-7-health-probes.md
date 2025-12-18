@@ -1,5 +1,13 @@
 # Step 7 – Health Probes: Self-Healing Applications
 
+![Health probes](/img/day-2/07-health-probes-01.jpg)
+
+![Liveness probe](/img/day-2/07-health-probes-02.jpg)
+
+![Readiness probe](/img/day-2/07-health-probes-03.jpg)
+
+![Startup probe](/img/day-2/07-health-probes-04.jpg)
+
 ## Concept
 
 In a distributed system, things fail. Processes hang, memory leaks, connections drop.
