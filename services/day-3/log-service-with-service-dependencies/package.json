@@ -1,0 +1,13 @@
+{
+    "name": "log-service",
+    "version": "1.0.0",
+    "description": "Simple service for Day 2 exercises",
+    "main": "server.js",
+    "type": "module",
+    "scripts": {
+        "start": "node server.js"
+    },
+    "dependencies": {
+        "express": "^4.22.0"
+    }
+}

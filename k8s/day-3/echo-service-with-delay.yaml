@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: echo-service
+  labels:
+    app: echo-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: echo-service
+  template:
+    metadata:
+      labels:
+        app: echo-service
+    spec:
+      containers:
+        - name: echo-service
+          # Make sure to build this image from services/day-3/echo-service-with-delay
+          image: echo-service-with-delay:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          env:
+            - name: APP_NAME
+              value: "echo-service"
+            - name: APP_VERSION
+              value: "echo-service-with-delay"
+            - name: FEATURE_FLAG_X
+              value: "off"
+            - name: SIMULATE_DELAY_MS
+              value: "3000" # 3 seconds delay
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: echo-service
+  labels:
+    app: echo-service
+spec:
+  type: ClusterIP
+  selector:
+    app: echo-service
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
