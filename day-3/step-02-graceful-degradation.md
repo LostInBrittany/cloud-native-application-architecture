@@ -156,4 +156,4 @@ time curl -X POST -H "Content-Type: application/json" -d '{}' localhost:8080/log
 
 ---
 
-[Next: Distributed Tracing](./step-2-distributed-tracing.md)
+[Next: Distributed Tracing](./step-03-distributed-tracing.md)
