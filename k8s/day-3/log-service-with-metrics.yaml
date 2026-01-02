@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: log-service
+  labels:
+    app: log-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: log-service
+  template:
+    metadata:
+      labels:
+        app: log-service
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+        - name: log-service
+          # This image should be built from services/day-3/log-service-with-metrics
+          image: log-service-with-metrics:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          env:
+            - name: APP_VERSION
+              value: "metrics-enabled"
+            - name: LOG_LEVEL
+              value: "info"
+            - name: DEPENDENCY_URL
+              value: "http://echo-service:8080/info"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: log-service
+  labels:
+    app: log-service
+spec:
+  type: ClusterIP
+  selector:
+    app: log-service
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080

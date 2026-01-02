@@ -1,0 +1,14 @@
+{
+    "name": "echo-service-with-delay",
+    "version": "1.0.0",
+    "type": "module",
+    "private": true,
+    "main": "server.js",
+    "scripts": {
+        "start": "node server.js"
+    },
+    "dependencies": {
+        "express": "^4.22.0",
+        "prom-client": "^15.1.3"
+    }
+}

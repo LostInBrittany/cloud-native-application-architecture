@@ -19,3 +19,9 @@ docker build -t log-service-with-retries:latest ./log-service-with-retries
 
 k3d image import echo-service-flaky:latest -c day3
 k3d image import log-service-with-retries:latest -c day3
+
+docker build -t log-service-with-metrics:latest ./log-service-with-metrics
+docker build -t echo-service-with-metrics:latest ./echo-service-with-metrics
+
+k3d image import log-service-with-metrics:latest -c day3
+k3d image import echo-service-with-metrics:latest -c day3
