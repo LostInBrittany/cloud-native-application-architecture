@@ -1,0 +1,7 @@
+persistence:
+  enabled: false
+adminPassword: admin
+grafana.ini:
+  server:
+    root_url: http://localhost:8080/grafana
+    serve_from_sub_path: true

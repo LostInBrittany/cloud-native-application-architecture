@@ -29,22 +29,37 @@ We need a system that:
 1.  **Reads** logs from *all* containers (Stdout/Stderr).
 2.  **Tags** them with metadata (Pod Name, Namespace, App Version).
 3.  **Ships** them to a central database.
-4.  **Lets us search/filter**.
+4.  **Lets us search/filter** efficiently.
 
-### The Cloud Native Stack (PLG)
-*   **Promtail**: Agent running on every node. Reads logs and sends them to Loki.
-*   **Loki**: The database. Indexed by labels (k8s-native), low resource usage.
-*   **Grafana**: The UI to visualize and query.
+### The Cloud Native Stack (FLG)
+
+We will implement the **FLG Stack** (Fluent Bit, Loki, Grafana), a modern, lightweight alternative to the traditional ELK stack.
+
+#### 1. The Collector: Fluent Bit
+*   **Role**: The "Truck Driver".
+*   **How it works**: Runs as a **DaemonSet** (one agent per Node). It tails the container log files in `/var/log/containers/`, parses them, adds Kubernetes metadata (e.g., "This log came from Pod X in Namespace Y"), and pushes them to Loki.
+*   **Why**: It is extremely lightweight (written in C), fast, and reliable.
+
+#### 2. The Store: Loki
+*   **Role**: The "Warehouse".
+*   **How it works**: A datastore optimized for logs. Unlike Elasticsearch, it **does not index the full text** of logs. Instead, it only indexes the **labels** (e.g., `app=log-service`, `env=prod`).
+*   **Why**: This makes it incredibly cheap to operate and resource-efficient (perfect for Kubernetes). It behaves like "Distributed Grep".
+
+#### 3. The Visualization: Grafana
+*   **Role**: The "Dashboard".
+*   **How it works**: Connects to Loki (and Prometheus) to query and visualize data.
+*   **Why**: It is the industry standard for observability dashboards. It allows you to correlate logs with metrics side-by-side.
 
 ## 3. Deploying the Stack
 
-We will use Helm to deploy the "Loki Stack" (Loki + Promtail + Grafana).
+We will use Helm to deploy Loki, Fluent Bit, and Grafana.
 
-### Task 3.1: Add Repo & Namespace
+### Task 3.1: Add Repos & Namespace
 
-1.  Add the Grafana repo:
+1.  Add repositories:
     ```bash
     helm repo add grafana https://grafana.github.io/helm-charts
+    helm repo add fluent https://fluent.github.io/helm-charts
     helm repo update
     ```
 2.  Create namespace:
@@ -54,33 +69,60 @@ We will use Helm to deploy the "Loki Stack" (Loki + Promtail + Grafana).
 
 ### Task 3.2: Install Loki (The Store)
 
-We use the "Single Binary" mode for simplicity in the lab.
+We use the "Single Binary" mode for simplicity.
 
 ```bash
 helm upgrade --install loki grafana/loki \
   --namespace monitoring \
-  --create-namespace \
   --set deploymentMode=SingleBinary \
-  --set loki.commonConfig.replication_factor=1 \
   --set loki.auth_enabled=false \
-  --set singleBinary.replicas=1 \
-  --set write.replicas=0 \
-  --set read.replicas=0 \
-  --set backend.replicas=0 \
+  --set loki.commonConfig.replication_factor=1 \
   --set loki.storage.type=filesystem \
+  --set gateway.enabled=false \
+  --set resultsCache.enabled=false \
+  --set chunksCache.enabled=false \
+  --set backend.replicas=0 \
+  --set read.replicas=0 \
+  --set write.replicas=0 \
+  --set singleBinary.replicas=1 \
   --set loki.useTestSchema=true
 ```
-*(This minimizes resource usage by disabling high-availability features meant for cloud storage)*
 
-### Task 3.3: Install Promtail (The Agent)
+### Task 3.3: Install Fluent Bit (The Agent)
 
-Promtail needs to know where Loki is (`loki-gateway` or `loki` service). Since we disabled the gateway, it's just `loki`.
+We need to configure Fluent Bit to send logs to Loki.
 
-```bash
-helm upgrade --install promtail grafana/promtail \
-  --namespace monitoring \
-  --set "config.clients[0].url=http://loki:3100/loki/api/v1/push"
-```
+1.  Create `k8s/day-3/fluent-bit-values.yaml`:
+
+    ```yaml
+    config:
+      outputs: |
+        [OUTPUT]
+            Name        loki
+            Match       *
+            Host        loki.monitoring.svc
+            Port        3100
+            Labels      job=fluent-bit
+            LabelKeys   pod_name, namespace_name
+    ```
+
+2.  Install it:
+
+    ```bash
+    helm upgrade --install fluent-bit fluent/fluent-bit \
+      --namespace monitoring \
+      --values k8s/day-3/fluent-bit-values.yaml
+    ```
+
+3. Verify it's running and sending messages to Loki:
+
+    ```bash
+    # Check Fluent Bit logs
+    kubectl logs -n monitoring -l app.kubernetes.io/name=fluent-bit --tail=50
+
+    # Look for successful connections to Loki
+    kubectl logs -n monitoring -l app.kubernetes.io/name=fluent-bit | grep -i loki
+    ```
 
 ### Task 3.4: Install Grafana (The UI)
 We configure it to automatically add Loki as a data source.
@@ -173,7 +215,7 @@ Try these queries in the query bar:
 *   **Find a Trace**:
     Take a Trace ID from your terminal output and search for it:
     ```promql
-    {app="log-service"} | json | method="GET" | traceId="YOUR-TRACE-ID-HERE"
+    {app=~".+"} | json | traceId="YOUR-TRACE-ID-HERE"
     ```
 
 > You now have a production-grade logging system running locally!

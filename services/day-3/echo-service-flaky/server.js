@@ -3,14 +3,18 @@ import os from "os";
 
 const app = express();
 app.use(express.json({ limit: "1mb" }));
+app.use(express.urlencoded({ extended: true }));
 app.use((req, _res, next) => {
+    const traceId = req.headers['x-request-id'] || "unknown";
+
     console.log(
         JSON.stringify({
-            msg: "request",
+            timestamp: new Date().toISOString(),
+            msg: "Handling request",
+            traceId: traceId, // <--- Correlation happens here
             method: req.method,
             path: req.path,
             hostname: os.hostname(),
-            timestamp: new Date().toISOString()
         })
     );
     next();
@@ -22,10 +26,31 @@ const FLAKY_RATE = 0.5; // 50% chance of failure
 
 app.use((req, res, next) => {
     if (Math.random() < FLAKY_RATE) {
-        console.log("💥 Simulating chaos failure (500)");
+        console.log(
+            JSON.stringify({
+                timestamp: new Date().toISOString(),
+                msg: "💥 Simulating chaos failure (500)",
+                traceId: req.headers['x-request-id'] || "unknown", // Keep trace context!
+                method: req.method,
+                path: req.path,
+                hostname: os.hostname(),
+            })
+        );
         return res.status(500).json({ error: "Internal Server Error (Simulated)" });
     }
     next();
+});
+
+// SIMULATE LATENCY
+const SIMULATE_DELAY_MS = Number(process.env.SIMULATE_DELAY_MS ?? 0);
+
+app.use((req, res, next) => {
+    if (SIMULATE_DELAY_MS > 0) {
+        // console.log(`Simulating delay of ${SIMULATE_DELAY_MS}ms...`);
+        setTimeout(next, SIMULATE_DELAY_MS);
+    } else {
+        next();
+    }
 });
 
 const port = Number(process.env.PORT ?? 8080);
@@ -91,7 +116,8 @@ app.listen(port, () => {
                 port,
                 APP_NAME,
                 APP_VERSION,
-                FEATURE_FLAG_X
+                FEATURE_FLAG_X,
+                SIMULATE_DELAY_MS
             },
             null,
             2

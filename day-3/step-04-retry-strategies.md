@@ -40,10 +40,10 @@ Wait `BackoffTime + Random(0, 50ms)`.
 We need a service that fails randomly to test our retries.
 
 **Task 2.1**: Create `echo-service-flaky`
-1.  Copy `services/day-1/echo-service` (the original simple one) to `services/day-3/echo-service-flaky`.
+1.  Copy `services/day-3/echo-service-with-tracing` (to preserve JSON logging) to `services/day-3/echo-service-flaky`.
 2.  Modify `services/day-3/echo-service-flaky/server.js` to fail 50% of the time.
 
-Add this middleware at the top:
+Add this middleware at the top (after imports):
 
 ```javascript
 // CHAOS MONKEY
@@ -51,7 +51,16 @@ const FLAKY_RATE = 0.5; // 50% chance of failure
 
 app.use((req, res, next) => {
     if (Math.random() < FLAKY_RATE) {
-        console.log("💥 Simulating chaos failure (500)");
+         console.log(
+            JSON.stringify({
+                timestamp: new Date().toISOString(),
+                msg: "💥 Simulating chaos failure (500)",
+                traceId: req.headers['x-request-id'] || "unknown", // Keep trace context!
+                method: req.method,
+                path: req.path,
+                hostname: os.hostname(),
+            })
+        );
         return res.status(500).json({ error: "Internal Server Error (Simulated)" });
     }
     next();
