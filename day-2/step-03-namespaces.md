@@ -34,19 +34,19 @@ kubectl get namespaces
 
 ## 2. Deploying to Multiple Namespaces
 
-We can use the **exact same manifest** `k8s/day-2/log-service.yml` for both environments.
+We can use the **exact same manifest** `k8s/day-2/log-service.yaml` for both environments.
 We just tell `kubectl` which "bucket" to put it in.
 
 Deploy to `dev`:
 
 ```bash
-kubectl apply -n dev -f k8s/day-2/log-service.yml
+kubectl apply -n dev -f k8s/day-2/log-service.yaml
 ```
 
 Deploy to `prod`:
 
 ```bash
-kubectl apply -n prod -f k8s/day-2/log-service.yml
+kubectl apply -n prod -f k8s/day-2/log-service.yaml
 ```
 
 ---

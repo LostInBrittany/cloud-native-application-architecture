@@ -106,7 +106,7 @@ kubectl taint node k3d-day2-agent-1 reserved=true:NoSchedule
 Now, deploy a "regular" app, like our `log-service`.
 
 ```bash
-kubectl apply -f k8s/day-2/log-service.yml
+kubectl apply -f k8s/day-2/log-service.yaml
 kubectl scale deployment log-service --replicas=5
 ```
 
@@ -129,7 +129,7 @@ If we *really* want something to run there, we must give it a "ticket" (Tolerati
 
 We have `service-a`. For High Availability (HA), we want its replicas to run on **different nodes**. If one node dies, we don't want to lose all replicas!
 
-Edit `k8s/day-1/service-a.yml` to add **Anti-Affinity**:
+Edit `k8s/day-1/service-a.yaml` to add **Anti-Affinity**:
 
 ```yaml
     spec:
@@ -150,7 +150,7 @@ Edit `k8s/day-1/service-a.yml` to add **Anti-Affinity**:
 Apply and scale:
 
 ```bash
-kubectl apply -f k8s/day-1/service-a.yml
+kubectl apply -f k8s/day-1/service-a.yaml
 kubectl scale deployment service-a --replicas=3
 ```
 

@@ -113,7 +113,7 @@ kubectl apply -f k8s/day-2/log-config-secret.yaml
 ## 3. Update the Deployment
 
 We need to tell the Pod to use these values.
-Edit `k8s/day-2/log-service.yml` to use image `v2` and inject the variables.
+Edit `k8s/day-2/log-service.yaml` to use image `v2` and inject the variables.
 
 ```yaml
 apiVersion: apps/v1
@@ -150,7 +150,7 @@ spec:
 Apply the changes:
 
 ```bash
-kubectl apply -f k8s/day-2/log-service.yml
+kubectl apply -f k8s/day-2/log-service.yaml
 ```
 
 ---

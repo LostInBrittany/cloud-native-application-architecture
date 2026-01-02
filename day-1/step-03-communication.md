@@ -70,8 +70,8 @@ cd ../../..
 Apply the manifests:
 
 ```bash
-kubectl apply -f k8s/day-1/service-a.yml
-kubectl apply -f k8s/day-1/service-b.yml
+kubectl apply -f k8s/day-1/service-a.yaml
+kubectl apply -f k8s/day-1/service-b.yaml
 ```
 
 Verify that both are running:

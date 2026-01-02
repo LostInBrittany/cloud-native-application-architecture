@@ -42,52 +42,52 @@ Before exploring scheduling, resource management, and affinities, we need a **mu
 
 We will use **K3d** for this.
 
-👉 [Go to Step 0: Multi-Node Setup (Kind vs K3d)](./step-0-multi-node-local-setup.md)
+👉 [Go to Step 0: Multi-Node Setup (Kind vs K3d)](./step-00-multi-node-local-setup.md)
 
 
 
 ## 1. Build & Deploy Your Own Service
-👉 [Go to Step 1: Build Your Own Log Service](./step-1-build-log-service.md)
+👉 [Go to Step 1: Build Your Own Log Service](./step-01-build-log-service.md)
 
 ## 2. Pods, Deployments, and Services (Revisited)
-👉 [Go to Step 2: Pods, Deployments, and Services](./step-2-core-concepts.md)
+👉 [Go to Step 2: Pods, Deployments, and Services](./step-02-core-concepts.md)
 
 ---
 
 ## 3. Namespaces – Logical Isolation
-👉 [Go to Step 3: Namespaces](./step-3-namespaces.md)
+👉 [Go to Step 3: Namespaces](./step-03-namespaces.md)
 
 ---
 
 ## 4. Executing Commands in Running Containers
-👉 [Go to Step 4: Executing Commands](./step-4-executing-commands.md)
+👉 [Go to Step 4: Executing Commands](./step-04-executing-commands.md)
 
 ---
 
 
 ## 5. Resource Management – Requests and Limits
-👉 [Go to Step 5: Resource Management](./step-5-resource-management.md)
+👉 [Go to Step 5: Resource Management](./step-05-resource-management.md)
 
 ---
 
 ## 6. ConfigMaps & Secrets – Configuration Outside the Image
-👉 [Go to Step 6: ConfigMaps & Secrets](./step-6-configmaps-secrets.md)
+👉 [Go to Step 6: ConfigMaps & Secrets](./step-06-configmaps-secrets.md)
 
 ---
 
 ## 7. Health Probes – Let Kubernetes Help You
-👉 [Go to Step 7: Health Probes](./step-7-health-probes.md)
+👉 [Go to Step 7: Health Probes](./step-07-health-probes.md)
 
 ---
 
 
 ## 8. Scheduling Constraints – Taints, Tolerations, Affinity
-👉 [Go to Step 8: Scheduling](./step-8-scheduling.md)
+👉 [Go to Step 8: Scheduling](./step-08-scheduling.md)
 
 ---
 
 ## 9. Dealing With Complexity – Why Tools Like Helm Exist
-👉 [Go to Step 9: Helm – The Package Manager](./step-9-helm.md)
+👉 [Go to Step 9: Helm – The Package Manager](./step-09-helm.md)
 
 ---
 

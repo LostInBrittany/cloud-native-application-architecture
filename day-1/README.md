@@ -145,26 +145,26 @@ Expect friction. This is normal.
 
 ### Step 0 – Local Environment Setup (Important)
 
-👉 [Go to Step 0: Local Environment Setup](./step-0-local-setup.md)
+👉 [Go to Step 0: Local Environment Setup](./step-00-local-setup.md)
 
 
 ---
 
 ### Step 1 – Containers as Immutable Artifacts
 
-👉 [Go to Step 1: Containers as Immutable Artifacts](./step-1-containers.md)
+👉 [Go to Step 1: Containers as Immutable Artifacts](./step-01-containers.md)
 
 ---
 
 ### Step 2 – Deploying echo-service to Kubernetes
 
-👉 [Go to Step 2: Deploying echo-service to Kubernetes](./step-2-deploy-to-k8s.md)
+👉 [Go to Step 2: Deploying echo-service to Kubernetes](./step-02-deploy-to-k8s.md)
 
 ---
 
 ### Step 3 – Service-to-Service Communication
 
-👉 [Go to Step 3: Service-to-Service Communication](./step-3-communication.md)
+👉 [Go to Step 3: Service-to-Service Communication](./step-03-communication.md)
 
 ---
 

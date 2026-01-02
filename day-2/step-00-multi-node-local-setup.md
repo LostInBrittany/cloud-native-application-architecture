@@ -151,7 +151,7 @@ Let's use our **echo-service** from Day 1 to prove it.
 3.  **Deploy**:
 
     ```bash
-    kubectl apply -f k8s/day-2/echo-service.yml
+    kubectl apply -f k8s/day-2/echo-service.yaml
     ```
 
     *(Note: This service listens on port 8080).*
@@ -187,7 +187,7 @@ Let's use our **echo-service** from Day 1 to prove it.
 6.  **Cleanup**:
 
     ```bash
-    kubectl delete -f k8s/day-2/echo-service.yml
+    kubectl delete -f k8s/day-2/echo-service.yaml
     ```
 
 ---

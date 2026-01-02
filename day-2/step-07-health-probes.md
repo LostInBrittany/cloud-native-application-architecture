@@ -57,7 +57,7 @@ k3d image import log-service:v3 -c day2
 
 ## 2. Configure LivenessProbe
 
-Update your deployment `k8s/day-2/log-service.yml`.
+Update your deployment `k8s/day-2/log-service.yaml`.
 Use the new image `v3` and add the probe section.
 
 ```yaml
@@ -76,7 +76,7 @@ Use the new image `v3` and add the probe section.
 Apply it:
 
 ```bash
-kubectl apply -f k8s/day-2/log-service.yml
+kubectl apply -f k8s/day-2/log-service.yaml
 ```
 
 ---

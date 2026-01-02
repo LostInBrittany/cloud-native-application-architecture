@@ -88,7 +88,7 @@ k3d image import log-service:v1 -c day2
 
 ## 4. Create Kubernetes Manifests
 
-Create a file `k8s/day-2/log-service.yml`.
+Create a file `k8s/day-2/log-service.yaml`.
 
 It must contain:
 
@@ -153,7 +153,7 @@ spec:
 Apply the manifest:
 
 ```bash
-kubectl apply -f k8s/day-2/log-service.yml
+kubectl apply -f k8s/day-2/log-service.yaml
 ```
 
 Verify it is running:
