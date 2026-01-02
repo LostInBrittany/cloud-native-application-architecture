@@ -25,3 +25,9 @@ docker build -t echo-service-with-metrics:latest ./echo-service-with-metrics
 
 k3d image import log-service-with-metrics:latest -c day3
 k3d image import echo-service-with-metrics:latest -c day3
+
+docker build -t log-service-with-otel:latest ./log-service-with-otel
+docker build -t echo-service-with-otel:latest ./echo-service-with-otel
+
+k3d image import log-service-with-otel:latest -c day3
+k3d image import echo-service-with-otel:latest -c day3

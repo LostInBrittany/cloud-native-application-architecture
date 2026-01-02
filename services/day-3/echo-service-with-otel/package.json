@@ -1,0 +1,20 @@
+{
+    "name": "echo-service-with-delay",
+    "version": "1.0.0",
+    "type": "module",
+    "private": true,
+    "main": "server.js",
+    "scripts": {
+        "start": "node --import ./instrumentation.js server.js"
+    },
+    "dependencies": {
+        "@opentelemetry/auto-instrumentations-node": "^0.47.0",
+        "@opentelemetry/core": "^1.25.0",
+        "@opentelemetry/exporter-trace-otlp-grpc": "^0.52.0",
+        "@opentelemetry/resources": "^1.25.0",
+        "@opentelemetry/sdk-node": "^0.52.0",
+        "@opentelemetry/semantic-conventions": "^1.25.0",
+        "express": "^4.22.0",
+        "prom-client": "^15.1.3"
+    }
+}
