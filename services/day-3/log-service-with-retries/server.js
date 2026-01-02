@@ -9,14 +9,23 @@ const APP_VERSION = process.env.APP_VERSION ?? "v1";
 const LOG_LEVEL = process.env.LOG_LEVEL ?? "info";
 
 // Middleware to log every request
+// Middleware to log every request
 app.use((req, res, next) => {
+    // 1. Get or Generate Trace ID
+    const traceId = req.headers['x-request-id'] || crypto.randomUUID();
+
+    // Attach traceId to request object for use in route handlers
+    req.traceId = traceId;
+
     const context = {
         timestamp: new Date().toISOString(),
+        msg: "Handling request",
+        traceId: traceId,
         method: req.method,
         path: req.path,
         hostname: os.hostname(),
         version: APP_VERSION,
-        headers: req.headers,
+        // headers: req.headers, // Optional: reduce noise
     };
 
     // Log to stdout (standard way in K8s)
@@ -71,18 +80,36 @@ app.all("*", async (req, res) => {
 
     try {
         console.log(`Calling dependency: ${DEPENDENCY_URL}`);
-        const response = await fetchWithRetry(DEPENDENCY_URL);
-        if (response.ok) {
-            dependencyInfo = await response.json();
-        } else {
-            dependencyInfo = { error: `Dependency returned ${response.status}` };
+
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 1000); // 1s timeout
+
+        try {
+            const fetchOptions = {
+                signal: controller.signal,
+                headers: {
+                    'X-Request-ID': req.traceId // <--- Use ID from middleware
+                }
+            };
+            const response = await fetchWithRetry(DEPENDENCY_URL, fetchOptions);
+            if (response.ok) {
+                dependencyInfo = await response.json();
+            } else {
+                dependencyInfo = { error: `Dependency returned ${response.status}` };
+            }
+        } finally {
+            clearTimeout(timeoutId);
         }
     } catch (error) {
-        console.error("Dependency call failed:", error.message);
-        dependencyInfo = { error: error.message };
+        if (error.name === 'AbortError') {
+            console.warn("Dependency call timed out");
+            dependencyInfo = { error: "upstream_dependency_timeout", degraded: true };
+        } else {
+            console.error("Dependency call failed:", error.message);
+            dependencyInfo = { error: error.message };
+        }
     }
 
-    console.log(`-----------------------------------`);
     res.json({
         message: "Hello from log-service",
         received: {

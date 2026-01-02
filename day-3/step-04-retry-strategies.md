@@ -66,7 +66,7 @@ app.use((req, res, next) => {
 Now we modify the consumer to tolerate these failures.
 
 **Task 3.1**: Create `log-service-with-retries`
-1.  Copy `services/day-3/log-service-with-service-dependencies` (the one WITHOUT timeout/tracing, simplest base) to `services/day-3/log-service-with-retries`.
+1.  Copy `services/day-3/log-service-with-tracing` (so we keep our nice JSON logs & trace IDs) to `services/day-3/log-service-with-retries`.
 2.  Install `async-retry` or implement a simple loop. Let's do a simple loop for clarity.
 
 **Task 3.2**: Implement Exponential Backoff + Jitter
@@ -77,36 +77,49 @@ Update `services/day-3/log-service-with-retries/server.js`:
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 // Helper: Fetch with Retry
-async function fetchWithRetry(url, options = {}, retries = 3, backoff = 100) {
+async function fetchWithRetry(url, options = {}, retriesLeft = 3) {
+    const MAX_RETRIES = 3;
+    const attempt = MAX_RETRIES - retriesLeft + 1;
+    const backoff = 100 * Math.pow(2, attempt - 1); // recalculate backoff based on attempt
+
     try {
         const response = await fetch(url, options);
 
         // Success: Return response
-        if (response.ok) return response;
+        if (response.ok) {
+            console.log(`✅ Dependency call succeeded on attempt #${attempt}`);
+            return response;
+        }
 
         // Failure (4xx): Do NOT retry client errors
         if (response.status >= 400 && response.status < 500) return response;
 
         throw new Error(`Server returned ${response.status}`);
     } catch (error) {
-        if (retries === 0) throw error; // No more retries
+        if (retriesLeft === 0) throw error; // No more retries
 
         // Jitter: Add random 0-50ms to avoid thundering herd
         const jitter = Math.floor(Math.random() * 50);
         const delay = backoff + jitter;
 
-        console.warn(`Request failed: ${error.message}. Retrying in ${delay}ms... (${retries} left)`);
+        console.warn(`Request failed: ${error.message}. Retrying in ${delay}ms... (${retriesLeft} retries left)`);
         await sleep(delay);
 
-        // Recursive retry with double backoff (Exponential)
-        return fetchWithRetry(url, options, retries - 1, backoff * 2);
+        // Recursive retry
+        return fetchWithRetry(url, options, retriesLeft - 1);
     }
 }
 
 // ... Inside your route handler ...
 // Replace your old fetch(DEPENDENCY_URL) with:
     try {
-        const response = await fetchWithRetry(DEPENDENCY_URL);
+        // Ensure you pass the headers for tracing!
+        const fetchOptions = {
+            headers: {
+                'X-Request-ID': req.traceId // Propagate Trace ID
+            }
+        };
+        const response = await fetchWithRetry(DEPENDENCY_URL, fetchOptions);
         // ... (rest of logic)
 ```
 
