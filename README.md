@@ -140,13 +140,12 @@ You are expected to:
 
 ---
 
-### Day 3 – Cloud Native Patterns & Observability
+### [Day 3 – Cloud Native Patterns & Observability](./day-3/README.md)
 
-* Resilience and failure handling
-* Health checks and probes
-* Configuration management
-* Logs, metrics, and basic observability
-* Debugging distributed applications
+*   Resilience patterns (Retries, Timeouts, Circuit Breakers)
+*   **The LGTM Stack**: Loki (Logs), Grafana, Tempo (Traces), Prometheus (Metrics)
+*   **OpenTelemetry**: Auto-instrumentation and context propagation
+*   Debugging distributed applications ("Break Me" Challenge)
 
 ---
 

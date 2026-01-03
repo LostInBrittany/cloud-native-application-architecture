@@ -31,13 +31,13 @@ Today we focus on two critical questions:
 
 We will purposefully introduce failures and network issues to see how our applications behave.
 
-### Step 1 – Ingress Basics
+### Step 1 – Ingress Basics (Traefik)
 👉 [Go to Step 1: Ingress & Traefik](./step-01-ingress-basics.md)
 
 ### Step 2 – Graceful Degradation & Timeouts
 👉 [Go to Step 2: Graceful Degradation](./step-02-graceful-degradation.md)
 
-### Step 3 – Distributed Tracing (Manual)
+### Step 3 – Distributed Tracing (The Manual Way)
 👉 [Go to Step 3: Distributed Tracing](./step-03-distributed-tracing.md)
 
 ### Step 4 – Retry Strategies & Backoff
@@ -45,24 +45,24 @@ We will purposefully introduce failures and network issues to see how our applic
 
 ---
 
-## Afternoon – Observability & Debugging
+## Afternoon – The Complete Observability Stack
 
-We stop guessing and start measuring.
+We stop guessing and start measuring using the **LGTM Stack**.
 
 ### Step 5 – The Three Pillars of Observability
 👉 [Go to Step 5: The Three Pillars](./step-05-three-pillars.md)
 
-### Step 6 – Centralized Logging
+### Step 6 – Logs (Fluent Bit + Loki)
 👉 [Go to Step 6: Centralized Logging](./step-06-centralized-logging.md)
 
-### Step 7 – Metrics with Prometheus & Grafana
+### Step 7 – Metrics (Prometheus)
 👉 [Go to Step 7: Metrics & Prometheus](./step-07-metrics-prometheus.md)
 
-### Step 8 – Distributed Tracing with OpenTelemetry
-👉 [Go to Step 8: OTEL & Jaeger](./step-08-tracing-opentelemetry.md)
+### Step 8 – Traces (OpenTelemetry + Tempo)
+👉 [Go to Step 8: OpenTelemetry & Tempo](./step-08-tracing-opentelemetry.md)
 
-### Step 9 – Debugging Distributed Applications
-👉 [Go to Step 9: Debugging Challenge](./step-09-debugging.md)
+### Step 9 – Debugging Challenge
+👉 [Go to Step 9: "Break me" Challenge](./step-09-debugging.md)
 
 ---
 
