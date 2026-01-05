@@ -180,13 +180,39 @@ We need to configure Fluent Bit to send logs to Loki.
     ```
 
 ### Task 3.4: Install Grafana (The UI)
-We configure it to automatically add Loki as a data source.
 
-```bash
-helm install grafana grafana/grafana \
-  --namespace monitoring \
-  -f k8s/day-3/grafana-values.yaml
-```
+We configure Grafana to automatically add Loki as a data source.
+
+1. Create `k8s/day-3/grafana-values.yaml`:
+
+    ```yaml
+    persistence:
+      enabled: false
+    adminPassword: admin
+    grafana.ini:
+      server:
+        root_url: http://localhost:8080/grafana
+        serve_from_sub_path: true
+    ```
+
+    **What this does:**
+    - `persistence: false` - No persistent storage (simplified for development)
+    - `adminPassword: admin` - Set a simple password for admin user
+    - `root_url` and `serve_from_sub_path` - Allow Grafana to work behind an Ingress at `/grafana` path
+
+2. Install Grafana:
+
+    ```bash
+    helm install grafana grafana/grafana \
+      --namespace monitoring \
+      -f k8s/day-3/grafana-values.yaml
+    ```
+
+3. Verify Grafana is running:
+
+    ```bash
+    kubectl get pods -n monitoring -l app.kubernetes.io/name=grafana
+    ```
 
 ### Task 3.5: Create Ingress
 
@@ -247,14 +273,33 @@ Since we installed them separately, we need to add Loki as a data source manuall
 
 ## 5. Querying Logs (LogQL)
 
+### Task 5.1: Generate Traffic
+
+Before querying logs, let's generate some activity to ensure we have logs to view:
+
+```bash
+# Make some requests to generate logs
+for i in {1..10}; do
+  curl -X POST http://localhost:8080/logs -H "Content-Type: application/json" -d '{"message": "Test log entry '$i'"}'
+  sleep 1
+done
+
+# Check that logs were created
+kubectl logs -n production -l app=log-service --tail=20
+```
+
+You should see the log entries from your requests.
+
+### Task 5.2: Query Logs in Grafana
+
 1.  Go to **Explore** (Compass icon on the left).
 2.  Ensure datasource is set to **Loki**.
 3.  Select Label Filter: `app` = `log-service`.
 4.  Click **Run Query** (top right).
 
-You should see logs from **all 3 replicas** merged together!
+You should see logs from **all replicas** merged together, including the test logs you just generated!
 
-### Task 5.1: Advanced Filtering
+### Task 5.3: Advanced Filtering
 Try these queries in the query bar:
 
 *   **Filter by string**:
