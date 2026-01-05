@@ -134,7 +134,7 @@ async function fetchWithRetry(url, options = {}, retriesLeft = 3) {
 
 ## 4. Verify
 
-1.  Deploy `echo-service-flaky` and `log-service-with-retries` (update ingress `/log` to point to `log-service-with-retries`).
+1.  Deploy `echo-service-flaky` and `log-service-with-retries`.
 2.  Send requests:
     ```bash
     for i in {1..10}; do curl localhost:8080/log; echo; done
