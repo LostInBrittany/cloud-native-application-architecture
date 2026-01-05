@@ -149,12 +149,14 @@ You are expected to:
 
 ---
 
-### Day 4 – Beyond the Basics
+### [Day 4 – Production Readiness & Final Challenge](./day-4/README.md)
 
-* Service mesh: concepts and use cases (simplified)
-* Traffic management and security (conceptual + demo)
-* Serverless architectures: when and why
-* Final architecture review and discussion
+* Security hardening for production workloads
+* Autoscaling (HPA) and availability guarantees (PDB)
+* GitOps with ArgoCD
+* Multi-environment configuration management
+* **The Final Challenge**: Comprehensive production incident simulation
+* Beyond the basics: When to use service mesh, serverless, and advanced tools
 
 ---
 
