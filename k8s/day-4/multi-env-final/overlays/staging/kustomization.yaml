@@ -1,0 +1,32 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: staging
+
+resources:
+  - ../../base
+
+# Staging: Use release candidate image
+images:
+  - name: compute-service
+    newName: compute-service
+    newTag: v1.2.3-rc1
+
+# Staging mirrors prod but with fewer replicas
+patches:
+  - target:
+      kind: Deployment
+      name: compute-service
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 2
+
+# Patch: Ingress hostname for staging
+  - target:
+      kind: Ingress
+      name: compute-service-ingress
+    patch: |-
+      - op: replace
+        path: /spec/rules/0/host
+        value: staging.localhost

@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: compute-service
+  namespace: production
+  labels:
+    app: compute-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: compute-service
+  template:
+    metadata:
+      labels:
+        app: compute-service
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 2000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: compute-service
+          image: compute-service:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          env:
+            - name: PORT
+              value: "8080"
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+      volumes:
+        - name: tmp
+          emptyDir: {}
+      automountServiceAccountToken: false
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: compute-service
+  namespace: production
+  labels:
+    app: compute-service
+spec:
+  type: ClusterIP
+  selector:
+    app: compute-service
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080

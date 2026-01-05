@@ -1,0 +1,18 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: compute-service-ingress
+  annotations:
+    ingress.kubernetes.io/ssl-redirect: "false"
+spec:
+  rules:
+    - host: localhost  # Will be patched per environment
+      http:
+        paths:
+          - path: /compute
+            pathType: Prefix
+            backend:
+              service:
+                name: compute-service
+                port:
+                  number: 8080

@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  LOG_LEVEL: "debug"  # More verbose in dev
+  FEATURE_FLAG_X: "on"  # Test new features in dev

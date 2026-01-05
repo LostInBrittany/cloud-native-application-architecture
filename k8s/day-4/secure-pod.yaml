@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: secure-pod
+spec:
+  securityContext:
+    runAsNonRoot: true      # Enforce non-root
+    runAsUser: 1000         # Specific UID
+    runAsGroup: 3000        # Specific GID
+    fsGroup: 2000           # For volume permissions
+  containers:
+    - name: app
+      image: busybox
+      command: ["sleep", "3600"]
+      securityContext:
+        allowPrivilegeEscalation: false  # Cannot gain more privileges
+        capabilities:
+          drop:
+            - ALL                         # Drop all Linux capabilities
+        readOnlyRootFilesystem: true      # Filesystem is read-only

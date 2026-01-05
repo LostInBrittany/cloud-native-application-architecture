@@ -1,0 +1,89 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: log-service
+  labels:
+    app: log-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: log-service
+  template:
+    metadata:
+      labels:
+        app: log-service
+      annotations:
+        # Prometheus annotations (from Day 3)
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+    spec:
+      # NEW: Pod-level security context
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 2000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: log-service
+          image: log-service-hardened:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          env:
+            # Application config (from Day 3)
+            - name: APP_NAME
+              value: "log-service-otel"
+            - name: APP_VERSION
+              value: "v1"
+            - name: PORT
+              value: "8080"
+            # Service dependency
+            - name: ECHO_SERVICE_URL
+              value: "http://echo-service:8080"
+            # OpenTelemetry config (from Day 3)
+            - name: OTEL_SERVICE_NAME
+              value: "log-service"
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "http://tempo.monitoring.svc.cluster.local:4317"
+          # NEW: Container-level security context
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+          # NEW: Writable volume for temporary files
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+          resources:
+            requests:
+              memory: "32Mi"
+              cpu: "50m"
+            limits:
+              memory: "128Mi"
+              cpu: "200m"
+      # NEW: Volumes for writable paths
+      volumes:
+        - name: tmp
+          emptyDir: {}
+      # NEW: Disable service account token mounting
+      automountServiceAccountToken: false
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: log-service
+  labels:
+    app: log-service
+spec:
+  type: ClusterIP
+  selector:
+    app: log-service
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080

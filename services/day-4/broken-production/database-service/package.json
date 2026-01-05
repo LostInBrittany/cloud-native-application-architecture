@@ -1,0 +1,13 @@
+{
+    "name": "database-service",
+    "version": "1.0.0",
+    "type": "module",
+    "description": "In-memory database service for CloudMart (with chaos mode)",
+    "main": "server.js",
+    "scripts": {
+        "start": "node server.js"
+    },
+    "dependencies": {
+        "express": "^4.18.2"
+    }
+}

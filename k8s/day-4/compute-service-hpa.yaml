@@ -1,0 +1,36 @@
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: compute-service-hpa
+  namespace: production
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: compute-service
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: AverageValue
+          averageValue: 200m # Scale when average CPU > 200m
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 60  # Wait 60s before scaling down
+      policies:
+        - type: Percent
+          value: 50  # Scale down by max 50% of current pods
+          periodSeconds: 15
+    scaleUp:
+      stabilizationWindowSeconds: 0  # Scale up immediately
+      policies:
+        - type: Percent
+          value: 100  # Double the pods
+          periodSeconds: 15
+        - type: Pods
+          value: 4  # Or add 4 pods
+          periodSeconds: 15
+      selectPolicy: Max  # Use whichever gives more pods

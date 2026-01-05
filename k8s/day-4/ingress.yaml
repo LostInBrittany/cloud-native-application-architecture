@@ -1,0 +1,30 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: day4-ingress
+spec:
+  ingressClassName: traefik
+  rules:
+    - http:
+        paths:
+          - path: /whoami
+            pathType: Prefix
+            backend:
+              service:
+                name: whoami
+                port:
+                  number: 80
+          - path: /echo
+            pathType: Prefix
+            backend:
+              service:
+                name: echo-service
+                port:
+                  number: 8080
+          - path: /log
+            pathType: Prefix
+            backend:
+              service:
+                name: log-service
+                port:
+                  number: 8080

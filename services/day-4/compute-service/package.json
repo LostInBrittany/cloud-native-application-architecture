@@ -1,0 +1,12 @@
+{
+  "name": "compute-service",
+  "version": "1.0.0",
+  "description": "CPU-intensive service for demonstrating autoscaling",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "4.22.1"
+  }
+}

@@ -1,0 +1,53 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: dev
+
+resources:
+  - ../../base
+
+# Dev: Use latest image tag
+images:
+  - name: compute-service
+    newName: compute-service
+    newTag: dev-latest
+
+# Patch: Scale down for dev (save resources)
+patches:
+  - target:
+      kind: Deployment
+      name: compute-service
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1
+
+# Patch: Lower resource requests for dev
+  - target:
+      kind: Deployment
+      name: compute-service
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/memory
+        value: "64Mi"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/cpu
+        value: "50m"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/memory
+        value: "128Mi"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/cpu
+        value: "100m"
+
+# Patch: ConfigMap for dev environment (debug logging, features on)
+  - path: config-patch.yaml
+
+# Patch: Ingress hostname for dev
+  - target:
+      kind: Ingress
+      name: compute-service-ingress
+    patch: |-
+      - op: replace
+        path: /spec/rules/0/host
+        value: dev.localhost

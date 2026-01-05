@@ -1,0 +1,10 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: compute-service-pdb
+  namespace: production
+spec:
+  minAvailable: 1  # At least 1 pod must remain available
+  selector:
+    matchLabels:
+      app: compute-service

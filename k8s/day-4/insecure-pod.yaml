@@ -1,0 +1,11 @@
+# k8s/day-4/insecure-pod.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: insecure-pod
+  namespace: production
+spec:
+  containers:
+    - name: app
+      image: busybox
+      command: ["sleep", "3600"]
