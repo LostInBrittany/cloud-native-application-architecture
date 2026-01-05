@@ -19,9 +19,20 @@ We will modify our `log-service` consumer to handle failures gracefully.
 
 To test timeouts, we need a slow service. Instead of finding a real slow server, we will make our `echo-service` artificially slow.
 
-### 1.1 Modify `echo-service`
+### 1.1 Create `echo-service-with-delay`
 
-Open `services/day-1/echo-service/server.js` and add this middleware **before** the routes (e.g., around line 18):
+We'll create a new version of echo-service with artificial latency.
+
+**Step 1: Copy the service code**
+
+```bash
+# Copy from Day 1's echo-service
+cp -r services/day-1/echo-service services/day-3/echo-service-with-delay
+```
+
+**Step 2: Modify the server code**
+
+Open `services/day-3/echo-service-with-delay/server.js` and add this middleware **before** the routes (around line 18):
 
 ```javascript
 // SIMULATE LATENCY
@@ -37,20 +48,72 @@ app.use((req, res, next) => {
 });
 ```
 
-### 1.2 Update the Deployment
-
-Update your deployment YAML (e.g., `k8s/day-1/echo-service.yml`) to include the delay configuration:
-
-```yaml
-          env:
-            - name: SIMULATE_DELAY_MS
-              value: "3000" # 3 seconds delay
-```
-
-Apply the changes:
+**Step 3: Build and import the Docker image**
 
 ```bash
-# Apply the new deployment configuration
+# Build the new image
+docker build -t echo-service-with-delay:latest services/day-3/echo-service-with-delay
+
+# Import into k3d cluster
+k3d image import echo-service-with-delay:latest -c day3
+```
+
+### 1.2 Create the Deployment Manifest
+
+Create `k8s/day-3/echo-service-with-delay.yaml`:
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: echo-service
+  labels:
+    app: echo-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: echo-service
+  template:
+    metadata:
+      labels:
+        app: echo-service
+    spec:
+      containers:
+        - name: echo-service
+          image: echo-service-with-delay:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          env:
+            - name: APP_NAME
+              value: "echo-service"
+            - name: APP_VERSION
+              value: "v1"
+            - name: PORT
+              value: "8080"
+            - name: SIMULATE_DELAY_MS
+              value: "3000"  # 3 seconds delay
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: echo-service
+  labels:
+    app: echo-service
+spec:
+  type: ClusterIP
+  selector:
+    app: echo-service
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+```
+
+**Deploy it:**
+
+```bash
 kubectl apply -f k8s/day-3/echo-service-with-delay.yaml
 ```
 
