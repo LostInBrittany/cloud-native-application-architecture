@@ -136,7 +136,7 @@ metadata:
   labels:
     app: log-service
 spec:
-  type: ClusterIP
+  type: LoadBalancer
   selector:
     app: log-service
   ports:
@@ -165,8 +165,7 @@ kubectl get pods
 Check the logs (this is why we built it!):
 
 ```bash
-# Generate some traffic (in another terminal, use port-forward)
-kubectl port-forward svc/log-service 8080:8080
+# Generate some traffic (using the integrated k3d load balancer)
 curl localhost:8080
 
 # Check logs

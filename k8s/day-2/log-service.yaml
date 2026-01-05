@@ -33,7 +33,7 @@ metadata:
   labels:
     app: log-service
 spec:
-  type: ClusterIP
+  type: LoadBalancer
   selector:
     app: log-service
   ports:
