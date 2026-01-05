@@ -124,7 +124,7 @@ spec:
 Now verify you can access the service directly via localhost:
 
 ```bash
-curl localhost:8080/whoami
+curl localhost:80/whoami
 ```
 
 > **Troubleshooting:**
