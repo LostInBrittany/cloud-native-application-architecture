@@ -88,6 +88,36 @@ helm upgrade --install loki grafana/loki \
   --set loki.useTestSchema=true
 ```
 
+**Verify Loki is running:**
+
+```bash
+# Check if the pod is running
+kubectl get pods -n monitoring -l app.kubernetes.io/name=loki
+
+# Check the logs
+kubectl logs -n monitoring -l app.kubernetes.io/name=loki --tail=50
+
+# Verify the service is available
+kubectl get svc -n monitoring loki
+```
+
+You should see:
+- Pod status: `Running`
+- Service: `loki` on port `3100`
+- Logs showing: `"msg":"Loki started"` or similar
+
+**Test Loki API:**
+
+```bash
+# Port-forward to access Loki
+kubectl port-forward -n monitoring svc/loki 3100:3100 &
+
+# Check Loki is ready
+curl http://localhost:3100/ready
+
+# Should return: "ready"
+```
+
 ### Task 3.3: Install Fluent Bit (The Agent)
 
 We need to configure Fluent Bit to send logs to Loki.
@@ -98,12 +128,37 @@ We need to configure Fluent Bit to send logs to Loki.
     config:
       outputs: |
         [OUTPUT]
-            Name        loki
-            Match       *
-            Host        loki.monitoring.svc
-            Port        3100
-            Labels      job=fluent-bit
-            LabelKeys   pod_name, namespace_name
+            Name loki
+            Match *
+            Host loki.monitoring.svc
+            Port 3100
+            Labels job=fluentbit
+            auto_kubernetes_labels on
+
+    # Disable problematic host mounts for k3d
+    hostNetwork: false
+    dnsPolicy: ClusterFirst
+
+    # Don't mount /etc/machine-id
+    daemonSetVolumes:
+      - name: varlog
+        hostPath:
+          path: /var/log
+      - name: varlibdockercontainers
+        hostPath:
+          path: /var/lib/docker/containers
+      - name: etcmachineid
+        hostPath:
+          path: /etc/machine-id
+          type: ""
+
+    daemonSetVolumeMounts:
+      - name: varlog
+        mountPath: /var/log
+        readOnly: true
+      - name: varlibdockercontainers
+        mountPath: /var/lib/docker/containers
+        readOnly: true
     ```
 
 2.  Install it:

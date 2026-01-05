@@ -3,8 +3,8 @@ config:
     [OUTPUT]
         Name loki
         Match *
-        Host loki-gateway
-        Port 80
+        Host loki.monitoring.svc
+        Port 3100
         Labels job=fluentbit
         auto_kubernetes_labels on
 
