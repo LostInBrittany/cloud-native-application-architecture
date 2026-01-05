@@ -161,10 +161,152 @@ You have two services:
 
 We want to "enrich" every log message with information from `echo-service`.
 
-1.  Copy your `log-service` from Day 2 to Day 3 (e.g., `services/day-3/log-service-step-01`).
-2.  Create a Kubernetes deployment for it.
-3.  **Dependency Configuration**: Ensure `log-service` calls the **internal Kubernetes Service DNS** (`http://echo-service`), NOT localhost.
-4.  **Ingress**: Expose `log-service` on path `/log`.
+**Step 1: Copy the service**
+
+```bash
+# Copy from Day 2
+cp -r services/day-2/log-service-step-01 services/day-3/log-service-with-service-dependencies
+```
+
+**Step 2: Add service dependency call**
+
+In your `services/day-3/log-service-with-service-dependencies/server.js`, add a function to call echo-service.
+
+At the top of the file, add the echo-service URL configuration:
+
+```javascript
+const ECHO_SERVICE_URL = process.env.ECHO_SERVICE_URL || "http://echo-service:8080";
+```
+
+> **Note:** We use `http://echo-service:8080` to call the service **internally within the Kubernetes cluster** (pod-to-pod communication). This bypasses the Ingress entirely. The Ingress (`localhost:8080/echo`) is only for external access from outside the cluster.
+
+Then create a helper function to enrich log messages by calling echo-service:
+
+```javascript
+// Helper function to enrich logs with data from echo-service
+async function enrichLogWithEchoData(logEntry) {
+    try {
+        // Call echo-service to get enrichment data
+        const response = await fetch(`${ECHO_SERVICE_URL}/echo`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: 'enrich' })
+        });
+
+        if (!response.ok) {
+            console.warn(`Echo service returned ${response.status}`);
+            return logEntry; // Return without enrichment
+        }
+
+        const echoData = await response.json();
+
+        // Add enrichment data to the log entry
+        return {
+            ...logEntry,
+            enrichment: {
+                echoedAt: echoData.timestamp,
+                echoedBy: echoData.hostname
+            }
+        };
+    } catch (error) {
+        console.warn('Failed to enrich log:', error.message);
+        return logEntry; // Return without enrichment on error
+    }
+}
+```
+
+Then update your `/log` endpoint to use this enrichment function:
+
+```javascript
+app.post('/log', async (req, res) => {
+    const logEntry = {
+        timestamp: new Date().toISOString(),
+        message: req.body.message || 'No message',
+        level: req.body.level || 'info'
+    };
+
+    // Enrich the log with data from echo-service
+    const enrichedLog = await enrichLogWithEchoData(logEntry);
+
+    console.log(JSON.stringify(enrichedLog));
+
+    res.json({
+        status: 'logged',
+        entry: enrichedLog
+    });
+});
+```
+
+**Step 3: Build and import the image**
+
+```bash
+# Build the image
+docker build -t log-service-with-service-dependencies:latest services/day-3/log-service-with-service-dependencies
+
+# Import into k3d
+k3d image import log-service-with-service-dependencies:latest -c day3
+```
+
+**Step 4: Create the deployment**
+
+Create `k8s/day-3/log-service-with-service-dependencies.yaml`:
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: log-service
+  labels:
+    app: log-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: log-service
+  template:
+    metadata:
+      labels:
+        app: log-service
+    spec:
+      containers:
+        - name: log-service
+          image: log-service-with-service-dependencies:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          env:
+            - name: APP_NAME
+              value: "log-service"
+            - name: APP_VERSION
+              value: "v1"
+            - name: PORT
+              value: "8080"
+            - name: ECHO_SERVICE_URL
+              value: "http://echo-service:8080"  # Kubernetes Service DNS
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: log-service
+  labels:
+    app: log-service
+spec:
+  type: ClusterIP
+  selector:
+    app: log-service
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+```
+
+**Deploy it:**
+
+```bash
+kubectl apply -f k8s/day-3/log-service-with-service-dependencies.yaml
+```
+
+**Step 5: Expose via Ingress**
 
 Add to `k8s/day-3/ingress.yaml`:
 ```yaml
@@ -191,14 +333,163 @@ Expected time: **3+ seconds**.
 
 We cannot let a helper service bring down our main service.
 
-**Goal:** modifying `log-service` to give up if `echo-service` takes more than **1 second**.
+**Goal:** Modify `log-service` to give up if `echo-service` takes more than **1 second**.
 
-**Steps:**
-1.  Use `fetch` (or `axios`) with an `AbortSignal` to enforce a timeout.
-2.  Set the timeout to `1000ms`.
-3.  **Handle the error**: Do NOT crash. Do NOT return 500.
-    *   If the request fails (timeout), log a warning and return the log **without** enrichment.
-    *   This is **Graceful Degradation**.
+**Step 1: Copy the service**
+
+```bash
+# Copy from the previous version
+cp -r services/day-3/log-service-with-service-dependencies services/day-3/log-service-with-timeout
+```
+
+**Step 2: Add timeout to the fetch call**
+
+Modern JavaScript's `fetch()` API supports timeouts using `AbortController` and `AbortSignal`. Here's how it works:
+
+1. Create an `AbortController` - this gives you control to cancel the request
+2. Pass its `signal` to the fetch call
+3. Set a timeout that calls `controller.abort()` after your time limit
+4. Catch the `AbortError` and handle it gracefully
+
+Update your `enrichLogWithEchoData` function in `services/day-3/log-service-with-timeout/server.js`:
+
+```javascript
+// Helper function to enrich logs with data from echo-service (with timeout)
+async function enrichLogWithEchoData(logEntry) {
+    // Create an AbortController to cancel the request if it takes too long
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 1000); // 1 second timeout
+
+    try {
+        // Call echo-service with the abort signal
+        const response = await fetch(`${ECHO_SERVICE_URL}/echo`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: 'enrich' }),
+            signal: controller.signal  // Pass the abort signal
+        });
+
+        // Clear the timeout if the request completed in time
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+            console.warn(`Echo service returned ${response.status}`);
+            return {
+                ...logEntry,
+                enrichment: 'unavailable (service error)'
+            };
+        }
+
+        const echoData = await response.json();
+
+        // Add enrichment data to the log entry
+        return {
+            ...logEntry,
+            enrichment: {
+                echoedAt: echoData.timestamp,
+                echoedBy: echoData.hostname
+            }
+        };
+    } catch (error) {
+        // Clear the timeout
+        clearTimeout(timeoutId);
+
+        // Check if the error was due to timeout
+        if (error.name === 'AbortError') {
+            console.warn('Echo service timeout - request took longer than 1s');
+            return {
+                ...logEntry,
+                enrichment: 'unavailable (timeout)'
+            };
+        }
+
+        // Handle other errors (network issues, etc.)
+        console.warn('Failed to enrich log:', error.message);
+        return {
+            ...logEntry,
+            enrichment: 'unavailable (error)'
+        };
+    }
+}
+```
+
+**What this code does:**
+
+1. **Creates AbortController**: `const controller = new AbortController()` - gives us a way to cancel the request
+2. **Sets timeout**: `setTimeout(() => controller.abort(), 1000)` - after 1 second, call `abort()` which cancels the fetch
+3. **Passes signal**: `signal: controller.signal` - connects the abort controller to the fetch request
+4. **Clears timeout on success**: If the request completes before 1s, we clear the timeout
+5. **Handles AbortError**: When the timeout fires, fetch throws an `AbortError` - we catch it and return the log without enrichment
+6. **Graceful degradation**: Always returns a valid log entry, never crashes the service
+
+**Step 3: Build and import the image**
+
+```bash
+# Build the image
+docker build -t log-service-with-timeout:latest services/day-3/log-service-with-timeout
+
+# Import into k3d
+k3d image import log-service-with-timeout:latest -c day3
+```
+
+**Step 4: Create deployment manifest**
+
+Create `k8s/day-3/log-service-with-timeout.yaml` (copy from the previous manifest and update the image name):
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: log-service
+  labels:
+    app: log-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: log-service
+  template:
+    metadata:
+      labels:
+        app: log-service
+    spec:
+      containers:
+        - name: log-service
+          image: log-service-with-timeout:latest  # Updated image name
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          env:
+            - name: APP_NAME
+              value: "log-service"
+            - name: APP_VERSION
+              value: "v1"
+            - name: PORT
+              value: "8080"
+            - name: ECHO_SERVICE_URL
+              value: "http://echo-service:8080"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: log-service
+  labels:
+    app: log-service
+spec:
+  type: ClusterIP
+  selector:
+    app: log-service
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+```
+
+**Deploy it:**
+
+```bash
+kubectl apply -f k8s/day-3/log-service-with-timeout.yaml
+```
 
 ### 2.3 Verify
 
