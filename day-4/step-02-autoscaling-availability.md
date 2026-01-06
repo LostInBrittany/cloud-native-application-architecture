@@ -90,12 +90,25 @@ kubectl wait --for=condition=available --timeout=60s deployment/metrics-server -
 
 First, we need a CPU-intensive service to demonstrate autoscaling. The echo-service is too lightweight to trigger CPU-based scaling.
 
-**Deploy compute-service:**
+**1. Build and Import the Image:**
+
+```bash
+# Build the image
+docker build -t compute-service:latest services/day-4/compute-service/
+
+# Import into k3d
+k3d image import compute-service:latest -c day4
+```
+
+**2. Deploy the Service:**
 
 ```bash
 kubectl apply -f k8s/day-4/compute-service.yaml
 kubectl apply -f k8s/day-4/ingress-step-02.yaml
 ```
+
+> **What does this service do?**
+> The `compute-service` is designed to be CPU-intensive. It calculates prime numbers in a loop to consume CPU cycles. This is necessary because HPA needs measurable CPU usage to trigger scaling actions. A standard "HelloWorld" app is too efficient and wouldn't trigger the autoscaler.
 
 The compute-service performs CPU-intensive prime number calculations that periodically yield to the event loop. This allows:
 - Multiple concurrent requests to share CPU time
