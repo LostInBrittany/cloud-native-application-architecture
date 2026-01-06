@@ -20,7 +20,23 @@ RBAC consists of three main components:
 2. **Role / ClusterRole (What):** A set of permissions (e.g., "can list pods").
 3. **RoleBinding / ClusterRoleBinding (Connection):** Connecting the "Who" to the "What".
 
-![RBAC Diagram](https://kubernetes.io/images/docs/rbac_resources.png) -> *Concept: User/SA + RoleBinding + Role = Access*
+```
+        Identity               Binding                 Permissions
+    +---------------+    +------------------+    +------------------+
+    | ServiceAccount| -> | RoleBinding      | -> | Role             |
+    | (Who)         |    | (Connection)     |    | (What)           |
+    +---------------+    +------------------+    +------------------+
+    | monitor-sa    |    | monitor-binding  |    | pod-viewer       |
+    +---------------+    +------------------+    +------------------+
+                                                        |
+                                                        v
+                                                 +------------------+
+                                                 | Rules:           |
+                                                 | - resources: pods|
+                                                 | - verbs: get     |
+                                                 +------------------+
+```
+-> *Concept: User/SA + RoleBinding + Role = Access*
 
 ---
 
