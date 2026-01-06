@@ -789,9 +789,9 @@ kubectl apply -k k8s/day-4/multi-env-final/overlays/prod
 
 ```bash
 # Check replicas in each environment
-kubectl get deployment compute-service -n dev -o jsonpath='{.spec.replicas}' && echo " replicas in dev"
-kubectl get deployment compute-service -n staging -o jsonpath='{.spec.replicas}' && echo " replicas in staging"
-kubectl get deployment compute-service -n production -o jsonpath='{.spec.replicas}' && echo " replicas in production"
+kubectl get deployment dev-compute-service -n dev -o jsonpath='{.spec.replicas}' && echo " replicas in dev"
+kubectl get deployment staging-compute-service -n staging -o jsonpath='{.spec.replicas}' && echo " replicas in staging"
+kubectl get deployment prod-compute-service -n production -o jsonpath='{.spec.replicas}' && echo " replicas in production"
 ```
 
 Expected output:
@@ -806,15 +806,15 @@ Expected output:
 ```bash
 # Check CPU requests in each environment
 echo "Dev CPU request:"
-kubectl get deployment compute-service -n dev -o jsonpath='{.spec.template.spec.containers[0].resources.requests.cpu}'
+kubectl get deployment dev-compute-service -n dev -o jsonpath='{.spec.template.spec.containers[0].resources.requests.cpu}'
 echo ""
 
 echo "Staging CPU request:"
-kubectl get deployment compute-service -n staging -o jsonpath='{.spec.template.spec.containers[0].resources.requests.cpu}'
+kubectl get deployment staging-compute-service -n staging -o jsonpath='{.spec.template.spec.containers[0].resources.requests.cpu}'
 echo ""
 
 echo "Production CPU request:"
-kubectl get deployment compute-service -n production -o jsonpath='{.spec.template.spec.containers[0].resources.requests.cpu}'
+kubectl get deployment prod-compute-service -n production -o jsonpath='{.spec.template.spec.containers[0].resources.requests.cpu}'
 echo ""
 ```
 
@@ -854,15 +854,15 @@ info
 ```bash
 # Check Ingress hosts
 echo "Dev Ingress:"
-kubectl get ingress compute-service-ingress -n dev -o jsonpath='{.spec.rules[0].host}'
+kubectl get ingress dev-compute-service-ingress -n dev -o jsonpath='{.spec.rules[0].host}'
 echo ""
 
 echo "Staging Ingress:"
-kubectl get ingress compute-service-ingress -n staging -o jsonpath='{.spec.rules[0].host}'
+kubectl get ingress staging-compute-service-ingress -n staging -o jsonpath='{.spec.rules[0].host}'
 echo ""
 
 echo "Production Ingress:"
-kubectl get ingress compute-service-ingress -n production -o jsonpath='{.spec.rules[0].host}'
+kubectl get ingress prod-compute-service-ingress -n production -o jsonpath='{.spec.rules[0].host}'
 echo ""
 ```
 
