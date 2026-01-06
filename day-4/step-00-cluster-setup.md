@@ -230,10 +230,10 @@ Accept: */*
 
 ```bash
 curl localhost:8080/echo
-# Expected: 503 Service Unavailable (service doesn't exist yet)
+# Expected: 404 Not Found or 503 Service Unavailable (service doesn't exist yet)
 
 curl localhost:8080/log
-# Expected: 503 Service Unavailable (service doesn't exist yet)
+# Expected: 404 Not Found or 503 Service Unavailable (service doesn't exist yet)
 ```
 
 This is normal! We'll deploy these services during the security hardening exercises in Step 1.
