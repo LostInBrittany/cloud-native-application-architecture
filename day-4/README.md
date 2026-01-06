@@ -78,18 +78,18 @@ The goal is not to teach every possible tool, but to give you the **mindset and 
 
 ---
 
-### Step 3 – GitOps with ArgoCD
+### Step 3 – Access Control & Least Privilege (RBAC)
 
-👉 [Go to Step 3: GitOps with ArgoCD](./step-03-gitops-argocd.md)
+👉 [Go to Step 3: Access Control](./step-03-access-control.md)
 
 **Topics:**
-* What GitOps solves (and what it doesn't)
-* ArgoCD installation and first application
-* Declarative deployments from Git
-* Drift detection and self-healing
+* ServiceAccounts as application identity
+* Roles vs ClusterRoles (Namespaced vs Global)
+* RoleBindings and granting least privilige
+* Practical security: Preventing "spy" pods
 
 **Key Question:**
-> How do I deploy safely, repeatably, and with full audit trail?
+> How do I ensure a compromised application can't take over my cluster?
 
 ---
 

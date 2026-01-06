@@ -1009,6 +1009,6 @@ kubectl top pods -n production -l app=compute-service
 
 You've hardened your services for production availability. Next:
 
-**Step 3: GitOps with ArgoCD** - Deploy safely with declarative, Git-based deployments
+**Step 3: Access Control (RBAC)** - Secure your applications with Least Privilege identity.
 
-[Continue to Step 3: GitOps with ArgoCD](./step-03-gitops-argocd.md)
+[Continue to Step 3: Access Control & Least Privilege](./step-03-access-control.md)
