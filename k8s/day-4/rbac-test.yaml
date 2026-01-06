@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: api-spy
+  namespace: default
+spec:
+  serviceAccountName: default  # START: Uses default SA (no permissions)
+  # serviceAccountName: monitor-sa  # FINAL: Will use this after setup
+  containers:
+  - name: spy
+    image: bitnami/kubectl:latest
+    command: ["sleep", "3600"]

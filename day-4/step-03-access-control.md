@@ -176,7 +176,7 @@ Now we need to update our pod to use the new `monitor-sa` identity.
 
 ### 4.1 Update the Pod
 
-Update `k8s/day-4/rbac-test.yaml`:
+We need to redeploy the pod with the new `monitor-sa` identity. Use the provided `rbac-test-with-sa.yaml`:
 
 ```yaml
 apiVersion: v1
@@ -196,7 +196,7 @@ Recreate the pod (ServiceAccount cannot be changed on running pod):
 
 ```bash
 kubectl delete pod api-spy --force
-kubectl apply -f k8s/day-4/rbac-test.yaml
+kubectl apply -f k8s/day-4/rbac-test-with-sa.yaml
 ```
 
 ### 4.2 Validate Permissions
